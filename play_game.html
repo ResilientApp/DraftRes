@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <head>
+        <title>DraftRes - Premier League Fantasy Football Draft</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="theme-name" content="agen"/>
+        <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
+        <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
+        <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <header class="navigation sticky-top" style="background-color: #07085d;">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+          <a class="navbar-brand" href="index.html"><img src="css/icons/logo-transparent-png.png" width="160" alt="Egen"></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+      
+          <div class="collapse navbar-collapse text-center" id="navigation">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://github.com/swatisinghvi99/DraftRes" target="_blank">Github
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Pages Table -->
+                <table class="pages-table">
+                    <tr>
+                        <th>Pages</th>
+                    </tr>
+
+                    <tr>
+                        <td><a href="#creating_your_team" onclick="showContent('creating_your_team')">1. About DraftRes</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#scoring_system" onclick="showContent('scoring_system')">2. Join or Create League</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#the_draft" onclick="showContent('the_draft')">3. The Draft</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="#join_the_fun" onclick="showContent('join_the_fun')">4. Why DraftRes?</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="content">
+                <div class="section2" id="creating_your_team">
+                    <h2 class="section-title">Getting Started</h2>
+                    <p>
+                        Ever dreamt of building a top football team with the best players across the globe to complete in the biggest stages? DraftRes offers the perfect platform for showcasing your tactical skills. Through DraftRes, you and your friends can create your unique teams through a process known as "the draft" The draft unfolds in turns until all squads are filled. 
+                    </p>
+                </div>
+
+                <div class="section2" id="scoring_system">
+                    <h2>Join or Create League</h2>
+                    <p>
+                        To embark on your journey, register and create or join a league. The draft itself is a
+                        turn-based process with a time limit per turn. The draft starts once all the teams join, once
+                        the draft starts, put your thinking cap on and assemble your unique lineup. The host sets the maximum
+                        number of teams, time per round that the players get to draft a player and the league name. The other players can join the league using the unique league ID that the host provides them.
+                    </p>
+                </div>
+                <div class="section2" id="the_draft">
+                    <h2>The Draft</h2>
+                    <p>
+                        The draft is when you pick your players. It consists of 12 rounds of picks and progresses turn by turn with each person in the league picking one player per turn. The order of the picks is chosen randomly when the draft starts. Each turn is between 15 seconds and 1 hour long depending on your league’s settings. If you don’t pick a player within the allotted time, or are offline during the draft, a player will be picked for you automatically. The order of picks is reversed every round in what is also known as a Snake Draft. This means whoever picked first in the 1st round, picks last in the 2nd round and then first again in the 3rd round and so on. Whoever was last to pick in the 1st round will pick first in the 2nd round.
+                    </p>
+                </div>
+                <div class="section2" id="join_the_fun">
+                    <h2>What sets DraftRes apart?</h2>
+                    <p>
+                        Our project introduces an immersive draft room accessible through valid room credentials. In
+                        this room, a unique draft method unfolds, with teams labeled A, B, C, and D following the
+                        serpentine or "snake" sequence (A-B-C-D-D-C-B-A). This dynamic and balanced order ensures fairness. Teams have a
+                        designated time limit for player selection, with automatic random selections for delays.
+                        Broadcast messages keep all teams informed of each selection, maintaining a comprehensive and
+                        up-to-date record. Once a player is chosen, their record is updated in real-time, enhancing the
+                        overall draft experience. DraftRes distinguishes itself from other Premier League fantasy games
+                        by eliminating the salary cap system. In DraftRes, each player can only be owned by a single team
+                        in your league at any given time, fostering uniqueness and strategic depth. DraftRes promotes
+                        competitiveness, social interaction, and fun, allowing you to feel like a true Premier League
+                        manager. Play with friends, showcase your acumen, and mold the perfect team. The fantasy football
+                        champion is the one with the best team at the end of the season. Dive into the world of
+                        DraftRes-where strategy meets excitement!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showContent(sectionId) {
+            // Hide all sections
+            var sections = document.querySelectorAll('.content .section2');
+            sections.forEach(function (section) {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include Bootstrap JS file -->
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- Your Other Scripts -->
+
+</body>
+
+</html>

@@ -1,3 +1,6 @@
+body{
+    padding: 0 !important;
+}
 .scroll-container {
     overflow-x: auto;
     white-space: nowrap; 
@@ -78,3 +81,79 @@
     text-align: center;
     border: 1px solid rgb(228, 228, 228);
 }
+
+table {
+    border-collapse: collapse;
+    width: 75%;
+    border: 1px solid black; 
+    margin: 10px 70px 25px 70px;
+  }
+
+  th, td {
+    border: 0.5px solid black; /* Add a border to cells */
+    padding: 8px;
+    /* text-align: left; */
+  }
+
+  th {
+    background-color: #f2f2f2;
+    padding-left: 25px !important;
+    padding-right: 25px !important;
+  }
+
+  /* Style the table header */
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    margin-bottom: 6px; /* Add margin at the bottom of the headers */
+    text-align: center !important; /* Center the text within the headers */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide any overflow */
+    text-overflow: ellipsis; /* Add ellipsis (...) for long text */
+
+  }
+
+ /* Style alternating rows with different background colors for better readability */
+tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+  }
+
+tr{
+    height: 2px;
+
+}
+
+#pagination{
+    text-align: center;
+    margin-bottom: 20px;
+}
+#pagination span{
+    text-align: right;
+    margin-right: 360px;
+    margin-bottom: 10px;
+    display: inline-block;
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    margin: 0 4px;
+    
+}
+.page-number.active {
+    background-color: #198754;
+  color: white;
+  border: 1px solid #198754;
+}
+
+.search{
+    margin-left: 70px !important; 
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+.navbar-brand{
+    margin-top: 2px;
+    margin-bottom: 15px;
+}
+

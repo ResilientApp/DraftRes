@@ -24,8 +24,8 @@
     });
   });
 
-  // venobox popup 
-  $('.venobox').venobox();
+  // // venobox popup 
+  // $('.venobox').venobox();
 
   // dropdown menu
   var mobileWidth = 992;

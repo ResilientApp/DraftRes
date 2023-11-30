@@ -3,6 +3,8 @@ import ResilientSDK from 'https://cdn.resilientdb.com/resilient-sdk.js';
 const sdk = new ResilientSDK();
 let recipientPublicKey = null;
 
+
+
 function initializePublicKey() {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -39,11 +41,15 @@ sdk.addMessageListener((event) => {
     alert(JSON.stringify(message));
 
     if (recipientPublicKey) {
-        window.location.href = `draft-page.html?link=${recipientPublicKey}`;
+       window.location.href = `draft-page.html?link=${recipientPublicKey}`;
+        
         sdk.sendMessage({
             direction: "get-page-script",
             id: JSON.stringify(message)
         });
+
+       
+        
     } else {
         console.error("Public key not initialized");
     }
@@ -65,7 +71,7 @@ function commitContentScript() {
         localStorage.setItem("leagueId", recipientPublicKey);
 
         var timeStamp = new Date().getTime();
-
+        
         sdk.sendMessage({
             direction: "commit-page-script",
             message: `"league": "${leagueName.value}","team": "${teamName.value}","time": "${timePerPick.value}","members": "${maxMembers.value}","leagueId": "${recipientPublicKey}","timeStamp": "${timeStamp}"`,
@@ -76,3 +82,52 @@ function commitContentScript() {
         console.error("Public key not initialized");
     }
 }
+
+
+    console.log("entered");
+    const url = 'http://cloud.draftres.pro/graphql';
+    const graphqlQuery = `
+        query {
+            getFilteredTransactions(filter: {
+                ownerPublicKey: "B2s9zdNwXXkuJR1nPGHG2eR8L6zVHiYhqP2e4UDy76sC"
+                recipientPublicKey: "GKKoh6vUaNVQd7fbkuuAWyRgYcdPbDLELVWfsNyRFbZj"
+            }) {
+                id
+                version
+                amount
+                metadata
+                operation
+                asset
+                publicKey
+                uri
+                type
+            }
+        }
+    `;
+  
+    const payload = {
+        query: graphqlQuery
+    };
+  
+    const headers = {
+        'Content-Type': 'application/json',
+        // Add any other headers as needed (e.g., authorization headers)
+    };
+  
+    fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("test");
+        console.log(data);
+        localStorage.setItem("data", JSON.stringify(data.data.getFilteredTransactions));
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+    
+  
