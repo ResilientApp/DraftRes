@@ -7,9 +7,19 @@ var maxMembers = localStorage.getItem("members");
 var refreshLeagueBtn = document.getElementById("refreshLeagueBtn");
 var data = JSON.parse(localStorage.getItem("data"));
 
-console.log(data, "player data");
-
 var assetTable = document.getElementById("assetTable").getElementsByTagName('tbody')[0];
+
+let hasPlayerSelected = false; //to track one chance in each round
+
+let selectedButtons = []; //to keep track of drafted buttons
+
+function disableAllDraftButtons() {
+    const draftButtons = document.querySelectorAll('.btn-success');
+    draftButtons.forEach(button => {
+        button.disabled = true;
+    });
+}
+
 
 data.sort((a, b) => {
     const overallA = getOverall(a.asset);
@@ -22,7 +32,6 @@ function getOverall(assetString) {
         const assetData = JSON.parse(assetString.replace(/'/g, "\""));
         return assetData.data.Overall || 0; // Return 0 if 'Overall' is not present in the asset data
     } catch (error) {
-        console.error("Error parsing 'asset' field:", error);
         return 0; // Return 0 in case of an error
     }
 }
@@ -118,15 +127,27 @@ function populateTable(dataToDisplay) {
             var draftButton = document.createElement('button');
             draftButton.textContent = 'Draft';
             draftButton.classList.add('btn', 'btn-success'); 
-            draftButton.addEventListener('click', function() {
-                console.log(`Player drafted: ${assetData.data.Name}`);
-            });
+            draftButton.id = index;
+            draftButton.disabled = true; //disabled initially
+            // draftButton.onclick = function() {
+            //     commitDraft(assetData.data.Name, index);
+            // };
+            draftButton.onclick = function() {
+                if (!hasPlayerSelected) {
+                    commitDraft(assetData.data.Name, index);
+                    hasPlayerSelected = true; // Set flag to true as player has made a selection
+                    selectedButtons.push(this.id); // Add the button's ID to the selected list
+
+                    //change button color
+                    this.style.backgroundColor = 'red'; // Change the button's color to red
+                    this.style.borderColor = 'darkred'; 
+
+                    disableAllDraftButtons(); // Disable all other draft buttons for this round
+                }
+            };
             draftCell.appendChild(draftButton);
-            console.log(`Asset Information for Item ${index + 1}:`);
-            console.log(assetData.data); // This will display the 'data' field inside 'asset'
-            console.log('\n');
           } catch (error) {
-            console.error(`Error parsing 'asset' field for Item ${index + 1}:`, error);
+            
           }
         }
       });
@@ -231,6 +252,17 @@ function updateCountdownDisplay(seconds, countdownElement) {
     }
 }
 
+//Function to enable draft buttons
+function enableDraftButtons() {
+    const draftButtons = document.querySelectorAll('.btn-success');
+    draftButtons.forEach(button => {
+        //enable all draft buttons except the previously drafted ones
+        if (!selectedButtons.includes(button.id)) {
+            button.disabled = false; 
+        }
+    });
+}
+
 function initializeDraftPage() {
     
     const numberOfRounds = 12; // Set this to the desired number of rounds
@@ -260,8 +292,12 @@ function initializeDraftPage() {
         }
     }
     
+    // var draftDirection = 1; //to track direction of draft
 
     function startCountdownForPlayer() {
+
+        hasPlayerSelected = false; //change flag
+        
         // Highlight current player
         highlightCurrentPlayer();
         document.getElementById('currentRound').textContent = currentRound;
@@ -281,6 +317,7 @@ function initializeDraftPage() {
                 if (countdownTimer <= 0) {
                     clearInterval(interval);
                     currentPlayer++;
+
                     if (currentPlayer <= maxMembers) {
                         startCountdownForPlayer(); // Start next player's countdown
                     } else {
@@ -304,10 +341,12 @@ function initializeDraftPage() {
                 countdownElement.textContent = `Waiting: ${bufferTime} seconds`;
                 if (bufferTime <= 0) {
                     clearInterval(bufferInterval);
+                    enableDraftButtons(); //enable draft buttons after buffer time
                     startRegularCountdown();
                 }
             }, 1000);
         } else {
+            enableDraftButtons(); // If not the first player of the first round, enable buttons immediately
             startRegularCountdown();
         }
     }
@@ -319,65 +358,116 @@ function initializeDraftPage() {
 
 // Add event listeners
 document.addEventListener('DOMContentLoaded', initializeDraftPage);
-refreshLeagueBtn.addEventListener('click', filterContentScript);
+refreshLeagueBtn.addEventListener('click', accountContentScript);
 var currentPageUrl = window.location.href;
 var urlParams = new URLSearchParams(new URL(currentPageUrl).search);
 
-var linkValue = urlParams.get('link');
-function filterContentScript() {
+function accountContentScript() {
     sdk.sendMessage({
-        direction: "filter-page-script",
-        owner: "E9i5MnApcy8nZ4JNkAghSBHSX7Kkv869dzf32q5hPoYB",
-        recipient: linkValue,
+      direction: "account-page-script",
     });
 }
 
+var linkValue = urlParams.get('link');
+var link2 = linkValue.split("?r=");
+var recipientPublicKey = link2[0];
+var flag="account";
 sdk.addMessageListener((event) => {
-    
     const messages = event.data.data;
-    function sortMessagesByTimestamp(messages) {
-        return messages.sort((a, b) => {
-            const assetA = JSON.parse(a.asset.replace(/'/g, '"'));
-            const assetB = JSON.parse(b.asset.replace(/'/g, '"'));
-            
-            const timestampA = parseInt(assetA.data.timeStamp, 10);
-            const timestampB = parseInt(assetB.data.timeStamp, 10);
-    
-            return timestampA - timestampB; // Sorts in ascending order
+    if(flag==="account"){
+        sdk.sendMessage({
+            direction: "filter-page-script",
+            owner: "",
+            recipient: recipientPublicKey,
         });
-    }
-    
-    const sortedMessages = sortMessagesByTimestamp(messages);
-    
-    sortedMessages.forEach((message, index) => {
-        try {
-            let correctedJson = message.asset.replace(/'/g, "\"").replace(/(\w+):/g, '"$1":');
-            const assetData = JSON.parse(correctedJson);
+        flag="refresh";
+    }else if(flag==="refresh"){
+        function sortMessagesByTimestamp(messages) {
+            // First filter the messages to include only those with function 'create' or 'join'
+            const filteredMessages = messages.filter(message => {
+                const asset = JSON.parse(message.asset.replace(/'/g, '"'));
+                const functionValue = asset.data.function;
+                return functionValue === 'create' || functionValue === 'join';
+            });
             
-            if (assetData.data.leagueId === linkValue) {
-                const teamName = assetData.data.team;
-                const playerNumber = (index % maxMembers) + 1; // Calculate player number
-
-                // Update this player in each round
-                for (let roundNumber = 1; roundNumber <= 12; roundNumber++) {
-                    const playerBlockSelector = `.round-container:nth-of-type(${roundNumber}) .player-block:nth-child(${playerNumber + 1}) .player-info2`;
-                    const playerBlock = document.querySelector(playerBlockSelector);
-
-                    const playerBlockSelectorInitials = `.round-container:nth-of-type(${roundNumber}) .player-block:nth-child(${playerNumber + 1}) .player-initials`;
-                    const playerBlockInitials = document.querySelector(playerBlockSelectorInitials);
-
-                    if (playerBlock && playerBlockInitials) {
-                        playerBlock.textContent = teamName;
-                        playerBlockInitials.textContent = getInitials(teamName);
-                    }
-
-                }
-            }
-        } catch (e) {
-            console.error("Error parsing message asset:", e);
+            // Then sort the filtered messages
+            return filteredMessages.sort((a, b) => {
+                const assetA = JSON.parse(a.asset.replace(/'/g, '"'));
+                const assetB = JSON.parse(b.asset.replace(/'/g, '"'));
+        
+                const timestampA = parseInt(assetA.data.timeStamp, 10);
+                const timestampB = parseInt(assetB.data.timeStamp, 10);
+        
+                return timestampA - timestampB; // Sorts in ascending order
+            });
         }
-    });
+        
+        const sortedMessages = sortMessagesByTimestamp(messages);
+        console.log(sortedMessages);
+        sortedMessages.forEach((message, index) => {
+            try {
+                let correctedJson = message.asset.replace(/'/g, "\"").replace(/(\w+):/g, '"$1":');
+                const assetData = JSON.parse(correctedJson);
+                
+                if (assetData.data.leagueId === linkValue) {
+                    const teamName = assetData.data.team;
+                    //const playerNumber = (index % maxMembers) + 1; // Calculate player number
+                    localStorage.setItem("teamName",teamName);
+                    // Update this player in each round
+                    for (let roundNumber = 1; roundNumber <= 12; roundNumber++) {
+                        let playerNumber;
+                        // Determine if the round is a normal (1, 2, 3, ...) or reverse round (..., 3, 2, 1)
+                        const isReverseRound = roundNumber % 2 === 0;
+
+                        if (!isReverseRound) {
+                            // Normal round order
+                            playerNumber = (index % maxMembers) + 1;
+                        } else {
+                            // Reversed round order
+                            playerNumber = maxMembers - (index % maxMembers);
+                        }
+                        const playerBlockSelector = `.round-container:nth-of-type(${roundNumber}) .player-block:nth-child(${playerNumber + 1}) .player-info2`;
+                        const playerBlock = document.querySelector(playerBlockSelector);
+
+                        const playerBlockSelectorInitials = `.round-container:nth-of-type(${roundNumber}) .player-block:nth-child(${playerNumber + 1}) .player-initials`;
+                        const playerBlockInitials = document.querySelector(playerBlockSelectorInitials);
+
+                        if (playerBlock && playerBlockInitials) {
+                            playerBlock.textContent = teamName;
+                            playerBlockInitials.textContent = getInitials(teamName);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Error parsing message asset:", e);
+            }
+        });
+    }else if(flag==="drafted"){
+        sdk.sendMessage({
+            direction: "get-page-script",
+            id: messages
+        });
+        flag = "disable";
+    }else if(flag==="disable"){
+        var asset = messages.asset.replace(/'/g, "\"").replace(/(\w+):/g, '"$1":');
+        var data = JSON.parse(asset);
+        var buttonId = data.data.playerId;
+        var btn = document.getElementById(buttonId);
+        btn.disabled=true;
+    }
 });
 function getInitials(name) {
     return name.split(' ').map(part => part[0]).join('').toUpperCase();
+}
+function commitDraft(name, id){
+    var team = localStorage.getItem("teamName");
+    console.log(team);
+    var timeStamp = new Date().getTime();
+    sdk.sendMessage({
+        direction: "commit-page-script",
+        message: `"team": "${team}","playerName": "${name}","playerId": "${id}", "timeStamp": "${timeStamp}"`,
+        amount: 100,
+        address: recipientPublicKey
+    });
+    flag="drafted";
 }
