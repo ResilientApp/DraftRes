@@ -80,8 +80,8 @@ const url = 'https://cloud.resilientdb.com/graphql';
 const graphqlQuery = `
     query {
         getFilteredTransactions(filter: {
-            ownerPublicKey: "B2s9zdNwXXkuJR1nPGHG2eR8L6zVHiYhqP2e4UDy76sC"
-            recipientPublicKey: "GKKoh6vUaNVQd7fbkuuAWyRgYcdPbDLELVWfsNyRFbZj"
+            ownerPublicKey: "5yir5HoVaVAuPGuMC7nX3SeC7a9G8MUH7EkrLVhS9c49"
+            recipientPublicKey: "J4WGSUP3XrYLmn8hkL4xQHkyq2DtiGNTmz2uNejPkw11"
         }) {
             id
             version
